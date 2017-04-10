@@ -4,12 +4,12 @@
 这个项目主要是使用深度学习和机器学习的方法来辨识快递单中的省份地址还有电话号码
 
 ### help link:
-#### tensorflow framwork:  
+#### tensorflow framework:  
 tensorflow doc: https://www.tensorflow.org/  
 keras doc: https://keras.io/  
 keras chinese doc: http://keras-cn.readthedocs.io/en/latest/
 
-#### pytorch framwork:
+#### pytorch framework:
 pytorch tutorial: http://pytorch.org/tutorials/  
 pytorch doc: http://pytorch.org/docs/
 
