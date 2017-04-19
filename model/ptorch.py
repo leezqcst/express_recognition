@@ -26,7 +26,7 @@ img_transform = {
 
 root_path = '../data'
 
-batch_size = 24
+batch_size = 26
 #读取数据文件夹
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'), transform=img_transform['train']),
@@ -61,7 +61,7 @@ optimizer = optim.SGD(mynet.parameters(), lr=1e-3, momentum=0.9)
 # 随机梯度下降，之后可以选择别的速度更快的如rmsprop
 criterion = nn.CrossEntropyLoss()
 
-num_epoch = 1
+num_epoch = 20
 
 for epoch in range(num_epoch):
     print(epoch + 1)
@@ -106,12 +106,10 @@ num_correct = 0.0
 total = 0.0
 for data in dataloader['val']:
     img, label = data
-    img = Variable(img).cuda()
+    img = Variable(img, volatile=True).cuda()
 
     out = mynet(img)
     _, pred = torch.max(out.data, 1)
     num_correct += (pred.cpu() == label).sum()
     total += label.size(0)
-print(total)
-print(data_size['val'])
 print('Acc:{}'.format(num_correct / total))
