@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
+import model
 
 img_transform = {
     'train': transforms.Compose([
@@ -23,9 +24,10 @@ img_transform = {
         ])
 }
 
-root_path = '../data'
+root_path = '/home/sherlock/Documents/express_recognition/data'
 
 batch_size = 26
+num_epoch = 200
 # 读取数据文件夹
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'),
@@ -51,9 +53,7 @@ img_classes = dataloader['train'].dataset.classes
 use_gpu = torch.cuda.is_available()
 
 # mynet = vgg16(3, 6)
-mynet = torchvision.models.inception_v3()
-
-mynet.fc = nn.Linear(2048, 30)
+mynet = model.inception_net(30)
 
 if use_gpu:
     mynet = mynet.cuda()
@@ -63,7 +63,6 @@ optimizer = optim.SGD(mynet.parameters(), lr=1e-3, momentum=0.9)
 # 随机梯度下降，之后可以选择别的速度更快的如rmsprop
 criterion = nn.CrossEntropyLoss()
 
-num_epoch = 20
 
 for epoch in range(num_epoch):
     print(epoch + 1)
@@ -115,3 +114,5 @@ for data in dataloader['val']:
     num_correct += (pred.cpu() == label).sum()
     total += label.size(0)
 print('Acc:{}'.format(num_correct / total))
+save_path = os.path.join(root_path, 'model_save/inception_pytorch.pkl')
+torch.save(mynet.state_dict(), save_path)

@@ -75,12 +75,20 @@ def sort_key(x):
 
 
 if __name__ == '__main__':
-    img_list = os.listdir('../data/train/telephone/telephone')
+    root_path = '/home/sherlock/Documents/express_recognition'
+    img_root_path = os.path.join(root_path,
+                                 'data/train/telephone/telephone')
+    label_root_path = os.path.join(root_path,
+                                   'data/train/telephone/label_tele.txt')
+    createdata_root_path = os.path.join(roo_path,
+                                        'data/train/telephone/tele_data')
+
+    img_list = os.listdir(img_root_path)
     img_list.sort(key=sort_key)
     img_path = []
     for i in range(len(img_list)):
-        img_path.append('../data/train/telephone/telephone/' + img_list[i])
-    with open('../data/train/telephone/label_tele.txt') as f:
+        img_path.append(img_root_path + img_list[i])
+    with open(label_root_path) as f:
         tele_num = f.readlines()
     label_list = [tele_num[i][-12: -1] for i in range(len(tele_num))]
-    createDataset('../data/train/telephone/tele_data', img_path, label_list)
+    createDataset(createdata_root_path, img_path, label_list)
