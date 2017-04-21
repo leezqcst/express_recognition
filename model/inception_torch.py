@@ -1,15 +1,14 @@
-import torch
-from torch import nn
-from torch.autograd import Variable
-import torch.nn.functional as F
-from torch import optim
-from torch.utils.data import DataLoader
-import torchvision
-from torchvision import transforms
-from torchvision.datasets import ImageFolder
 import os
 import time
 
+import torch
+import torchvision
+from torch import nn
+from torch import optim
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 img_transform = {
     'train': transforms.Compose([
@@ -27,15 +26,18 @@ img_transform = {
 root_path = '../data'
 
 batch_size = 26
-#读取数据文件夹
+# 读取数据文件夹
 dset = {
-    'train': ImageFolder(os.path.join(root_path, 'train/province'), transform=img_transform['train']),
-    'val': ImageFolder(os.path.join(root_path, 'val/province'), transform=img_transform['val'])
+    'train': ImageFolder(os.path.join(root_path, 'train/province'),
+                         transform=img_transform['train']),
+    'val': ImageFolder(os.path.join(root_path, 'val/province'),
+                       transform=img_transform['val'])
 }
 
-#读取数据
+# 读取数据
 dataloader = {
-    'train': DataLoader(dset['train'], batch_size=batch_size, shuffle=True, num_workers=4),
+    'train': DataLoader(dset['train'], batch_size=batch_size, shuffle=True,
+                        num_workers=4),
     'val': DataLoader(dset['val'], batch_size=batch_size, num_workers=4)
 }
 
@@ -83,7 +85,7 @@ for epoch in range(num_epoch):
         optimizer.step()
 
         running_loss += loss.data[0] * label.size(0)
-        num_correct = torch.sum(pred==label)
+        num_correct = torch.sum(pred == label)
         running_acc += num_correct.data[0]
         if i % 50 == 0:
             print('Loss:{:.4f}, Acc: {:.4f}'.format(

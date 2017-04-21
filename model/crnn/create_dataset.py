@@ -1,6 +1,5 @@
-
 import os
-import lmdb # install lmdb by "pip install lmdb"
+import lmdb  # install lmdb by "pip install lmdb"
 import cv2
 import numpy as np
 
@@ -8,8 +7,8 @@ import numpy as np
 def checkImageIsValid(imageBin):
     if imageBin is None:
         return False
-    imageBuf = np.fromstring(imageBin, dtype=np.uint8) # read from string
-    img = cv2.imdecode(imageBuf, cv2.IMREAD_GRAYSCALE) # get img matrix
+    imageBuf = np.fromstring(imageBin, dtype=np.uint8)  # read from string
+    img = cv2.imdecode(imageBuf, cv2.IMREAD_GRAYSCALE)  # get img matrix
     imgH, imgW = img.shape[0], img.shape[1]
     if imgH * imgW == 0:
         return False
@@ -18,11 +17,12 @@ def checkImageIsValid(imageBin):
 
 def writeCache(env, cache):
     with env.begin(write=True) as txn:
-        for k, v in cache.iteritems():
+        for k, v in cache.items():
             txn.put(k, v)
 
 
-def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkValid=True):
+def createDataset(outputPath, imagePathList,
+                  labelList, lexiconList=None, checkValid=True):
     """
     Create LMDB dataset for CRNN training.
 
@@ -44,19 +44,19 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
         if not os.path.exists(imagePath):
             print('%s does not exist' % imagePath)
             continue
-        with open(imagePath, 'r') as f:
+        with open(imagePath, 'rb') as f:
             imageBin = f.read()
         if checkValid:
             if not checkImageIsValid(imageBin):
                 print('%s is not a valid image' % imagePath)
                 continue
 
-        imageKey = 'image-%09d' % cnt
-        labelKey = 'label-%09d' % cnt
+        imageKey = b'image-%09d' % cnt
+        labelKey = b'label-%09d' % cnt
         cache[imageKey] = imageBin
-        cache[labelKey] = label
+        cache[labelKey] = label.encode()
         if lexiconList:
-            lexiconKey = 'lexicon-%09d' % cnt
+            lexiconKey = b'lexicon-%09d' % cnt
             cache[lexiconKey] = ' '.join(lexiconList[i])
         if cnt % 1000 == 0:
             writeCache(env, cache)
@@ -64,10 +64,23 @@ def createDataset(outputPath, imagePathList, labelList, lexiconList=None, checkV
             print('Written %d / %d' % (cnt, nSamples))
         cnt += 1
     nSamples = cnt-1
-    cache['num-samples'] = str(nSamples)
+    cache[b'num-samples'] = str(nSamples).encode()
     writeCache(env, cache)
     print('Created dataset with %d samples' % nSamples)
 
 
+def sort_key(x):
+    temp = x.split('.')
+    return int(temp[0])
+
+
 if __name__ == '__main__':
-    pass
+    img_list = os.listdir('../data/train/telephone/telephone')
+    img_list.sort(key=sort_key)
+    img_path = []
+    for i in range(len(img_list)):
+        img_path.append('../data/train/telephone/telephone/' + img_list[i])
+    with open('../data/train/telephone/label_tele.txt') as f:
+        tele_num = f.readlines()
+    label_list = [tele_num[i][-12: -1] for i in range(len(tele_num))]
+    createDataset('../data/train/telephone/tele_data', img_path, label_list)
