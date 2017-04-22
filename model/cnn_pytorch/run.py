@@ -26,8 +26,8 @@ img_transform = {
 
 root_path = '/home/sherlock/Documents/express_recognition/data'
 
-batch_size = 26
-num_epoch = 200
+batch_size = 16
+num_epoch = 1
 # 读取数据文件夹
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'),
@@ -52,8 +52,9 @@ img_classes = dataloader['train'].dataset.classes
 
 use_gpu = torch.cuda.is_available()
 
-# mynet = vgg16(3, 6)
-mynet = model.inception_net(30)
+# mynet = model.inception_net(30)
+# mynet = model.vgg_net(30)
+mynet = model.resnet_net(30)
 
 if use_gpu:
     mynet = mynet.cuda()
@@ -75,7 +76,7 @@ for epoch in range(num_epoch):
         img = Variable(img).cuda()
         label = Variable(label).cuda()
         # forward
-        out, _ = mynet(img)
+        out = mynet(img)
         loss = criterion(out, label)
         _, pred = torch.max(out, 1)
         # backward
