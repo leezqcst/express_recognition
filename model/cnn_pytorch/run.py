@@ -14,20 +14,20 @@ import model
 img_transform = {
     'train': transforms.Compose([
             transforms.Scale(150),
-            transforms.CenterCrop(299),
+            transforms.CenterCrop(224),
             transforms.ToTensor()
         ]),
     'val': transforms.Compose([
             transforms.Scale(150),
-            transforms.CenterCrop(299),
+            transforms.CenterCrop(224),
             transforms.ToTensor()
         ])
 }
 
 root_path = '/home/sherlock/Documents/express_recognition/data'
 
-batch_size = 16
-num_epoch = 1
+batch_size = 12
+num_epoch = 100
 # 读取数据文件夹
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'),
