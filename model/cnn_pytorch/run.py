@@ -1,5 +1,6 @@
 import os
 import time
+import argparse
 
 import torch
 import torchvision
@@ -11,23 +12,43 @@ from torchvision import transforms
 from torchvision.datasets import ImageFolder
 import model
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--model', required=True,
+                    help='model choice: inception, vgg, resnet')
+parser.add_argument('--batch_size', type=int, required=True, help='batch_size')
+parser.add_argument('--epoch', type=int, required=True,
+                    help='numbers of epoch')
+parser.add_argument('--n_classes', type=int, help='numbers of classes',
+                    default=30)
+parser.add_argument('--num_worker', type=int,
+                    help='number of data loading workers', default=4)
+opt = parser.parse_args()
+print(opt)
+
+if opt.model == 'vgg':
+    img_size = 224
+if opt.model == 'inception':
+    img_size = 299
+if opt.model == 'resent':
+    img_size = 299
+
 img_transform = {
     'train': transforms.Compose([
             transforms.Scale(150),
-            transforms.CenterCrop(224),
+            transforms.CenterCrop(img_size),
             transforms.ToTensor()
         ]),
     'val': transforms.Compose([
             transforms.Scale(150),
-            transforms.CenterCrop(224),
+            transforms.CenterCrop(img_size),
             transforms.ToTensor()
         ])
 }
 
 root_path = '/home/sherlock/Documents/express_recognition/data'
 
-batch_size = 12
-num_epoch = 100
+batch_size = opt.batch_size
+num_epoch = opt.epoch
 # 读取数据文件夹
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'),
@@ -39,8 +60,9 @@ dset = {
 # 读取数据
 dataloader = {
     'train': DataLoader(dset['train'], batch_size=batch_size, shuffle=True,
-                        num_workers=4),
-    'val': DataLoader(dset['val'], batch_size=batch_size, num_workers=4)
+                        num_workers=opt.num_worker),
+    'val': DataLoader(dset['val'], batch_size=batch_size,
+                      num_workers=opt.num_worker)
 }
 
 data_size = {
@@ -52,9 +74,12 @@ img_classes = dataloader['train'].dataset.classes
 
 use_gpu = torch.cuda.is_available()
 
-# mynet = model.inception_net(30)
-# mynet = model.vgg_net(30)
-mynet = model.resnet_net(30)
+if opt.model == 'vgg':
+    mynet = model.vgg_net(opt.n_classes)
+if opt.model == 'inception':
+    mynet = model.inception_net(opt.n_classes)
+if opt.model == 'resnet':
+    mynet = model.resnet_net(opt.n_classes)
 
 if use_gpu:
     mynet = mynet.cuda()
@@ -76,7 +101,10 @@ for epoch in range(num_epoch):
         img = Variable(img).cuda()
         label = Variable(label).cuda()
         # forward
-        out = mynet(img)
+        if opt.model == 'inception':
+            out, _ = mynet(img)
+        else:
+            out = mynet(img)
         loss = criterion(out, label)
         _, pred = torch.max(out, 1)
         # backward
@@ -115,5 +143,5 @@ for data in dataloader['val']:
     num_correct += (pred.cpu() == label).sum()
     total += label.size(0)
 print('Acc:{}'.format(num_correct / total))
-save_path = os.path.join(root_path, 'model_save/inception_pytorch.pkl')
+save_path = os.path.join(root_path, 'model_save/' + opt.model + '.pth')
 torch.save(mynet.state_dict(), save_path)

@@ -14,7 +14,7 @@ img_transform = transforms.Compose([
 ])
 
 root_path = '/home/sherlock/Documents/express_recognition/data'
-model_path = os.path.join(root_path, 'model_save/inception_pytorch.pkl')
+model_path = os.path.join(root_path, 'model_save/example.pth')
 
 batch_size = 32
 num_worker = 4
