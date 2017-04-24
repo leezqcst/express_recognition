@@ -15,6 +15,8 @@ import model
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True,
                     help='model choice: inception, vgg, resnet')
+parser.add_argument('--path', required=True,
+                    help='data set path: province, city')
 parser.add_argument('--batch_size', type=int, required=True, help='batch_size')
 parser.add_argument('--epoch', type=int, required=True,
                     help='numbers of epoch')
@@ -53,7 +55,7 @@ num_epoch = opt.epoch
 dset = {
     'train': ImageFolder(os.path.join(root_path, 'train/province'),
                          transform=img_transform['train']),
-    'val': ImageFolder(os.path.join(root_path, 'val/province'),
+    'val': ImageFolder(os.path.join(root_path, 'validation/province'),
                        transform=img_transform['val'])
 }
 
@@ -129,7 +131,7 @@ for epoch in range(num_epoch):
                                                         running_acc,
                                                         elips_time))
     print()
-
+print('Finish Training!')
 # validation
 mynet.eval()
 num_correct = 0.0
@@ -143,5 +145,6 @@ for data in dataloader['val']:
     num_correct += (pred.cpu() == label).sum()
     total += label.size(0)
 print('Acc:{}'.format(num_correct / total))
-save_path = os.path.join(root_path, 'model_save/' + opt.model + '.pth')
+save_path = os.path.join(root_path,
+                         'model_save/' + opt.path + '/' + opt.model + '.pth')
 torch.save(mynet.state_dict(), save_path)

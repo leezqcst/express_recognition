@@ -1,4 +1,5 @@
 import os
+import argparse
 
 import torch
 import torchvision.transforms as transforms
@@ -7,26 +8,53 @@ from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 import model
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--model', required=True,
+                    help='model choice: inception, vgg, resnet')
+parser.add_argument('--path', required=True,
+                    help='data set path: province, city')
+parser.add_argument('--n_classes', type=int, help='numbers of classes',
+                    default=30)
+parser.add_argument('--num_worker', type=int,
+                    help='number of data loading workers', default=4)
+opt = parser.parse_args()
+print(opt)
+
+if opt.model == 'vgg':
+    img_size = 224
+if opt.model == 'inception':
+    img_size = 299
+if opt.model == 'resnet':
+    img_size = 299
+
 img_transform = transforms.Compose([
     transforms.Scale(150),
-    transforms.CenterCrop(299),
+    transforms.CenterCrop(img_size),
     transforms.ToTensor()
 ])
 
 root_path = '/home/sherlock/Documents/express_recognition/data'
-model_path = os.path.join(root_path, 'model_save/example.pth')
+model_path = os.path.join(root_path,
+                          'model_save/' + opt.path + '/' + opt.model + '.pth')
 
 batch_size = 32
-num_worker = 4
+num_worker = opt.num_worker
 
-dset = ImageFolder(os.path.join(root_path, 'val/province'),
+dset = ImageFolder(os.path.join(root_path, 'validation/' + opt.path),
                    transform=img_transform)
 
 dataloader = DataLoader(dset, batch_size=batch_size, shuffle=False,
                         num_workers=num_worker)
 
 use_gpu = torch.cuda.is_available()
-mynet = model.inception_net(30)
+
+if opt.model == 'vgg':
+    mynet = model.vgg_net(opt.n_classes)
+if opt.model == 'inception':
+    mynet = model.inception_net(opt.n_classes)
+if opt.model == 'resnet':
+    mynet = model.resnet_net(opt.n_classes)
+
 mynet.load_state_dict(torch.load(model_path))
 
 if use_gpu:
