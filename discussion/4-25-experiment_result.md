@@ -17,7 +17,7 @@
  - vgg:  
  batch_size: 32  
  learning_rate: 0.001  
- validation_accuracy:
+ validation_accuracy: 0.748333
 
  - inceptionV3:  
  batch_size: 32  
