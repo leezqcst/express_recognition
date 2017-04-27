@@ -10,7 +10,8 @@ import model
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True,
-                    help='model choice: inception, vgg, resnet')
+                    help='model choice: inceptionV3, \
+                    inceptionV4, resnet101, resnet152')
 parser.add_argument('--path', required=True,
                     help='data set path: province, city')
 parser.add_argument('--n_classes', type=int, help='numbers of classes',
@@ -20,9 +21,9 @@ parser.add_argument('--num_worker', type=int,
 opt = parser.parse_args()
 print(opt)
 
-if opt.model == 'vgg':
-    img_size = 224
-if opt.model == 'inception':
+if opt.model == 'inceptionV3':
+    img_size = 299
+if opt.model == 'inceptionV4':
     img_size = 299
 if opt.model == 'resnet':
     img_size = 299
@@ -48,12 +49,14 @@ dataloader = DataLoader(dset, batch_size=batch_size, shuffle=False,
 
 use_gpu = torch.cuda.is_available()
 
-if opt.model == 'vgg':
-    mynet = model.vgg_net(opt.n_classes)
-if opt.model == 'inception':
-    mynet = model.inception_net(opt.n_classes)
-if opt.model == 'resnet':
-    mynet = model.resnet_net(opt.n_classes)
+if opt.model == 'inceptionV3':
+    mynet = model.inceptionV3(opt.n_classes)
+if opt.model == 'inceptionV4':
+    mynet = model.InceptionV4(opt.n_classes)
+if opt.model == 'resnet101':
+    mynet = model.resnet(opt.n_classes, 101)
+if opt.model == 'resnet152':
+    mynet = model.resnet(opt.n_classes, 152)
 
 mynet.load_state_dict(torch.load(model_path))
 
