@@ -4,7 +4,6 @@ import sys
 import torch
 import torchvision.models as models
 from torch import nn
-from torch.autograd import Variable
 
 
 def inceptionV3(n_classes, pretrained=False):
@@ -62,10 +61,7 @@ class BasicConv2d(nn.Module):
                               padding=padding,
                               bias=False)
 
-        self.bn = nn.BatchNorm2d(out_planes,
-                                 eps=0.001,
-                                 momentum=0,
-                                 affine=True)
+        self.bn = nn.BatchNorm2d(out_planes, eps=0.001)
 
         self.relu = nn.ReLU(inplace=True)
 
@@ -146,7 +142,7 @@ class Inception_A(nn.Module):
         )
 
         self.branch3 = nn.Sequential(
-            nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
+            nn.AvgPool2d(3, stride=1, padding=1),
             BasicConv2d(384, 96, kernel_size=1, stride=1)
         )
 
@@ -206,7 +202,7 @@ class Inception_B(nn.Module):
         )
 
         self.branch3 = nn.Sequential(
-            nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
+            nn.AvgPool2d(3, stride=1, padding=1),
             BasicConv2d(1024, 128, kernel_size=1, stride=1)
         )
 
@@ -278,7 +274,7 @@ class Inception_C(nn.Module):
                                       stride=1, padding=(1, 0))
 
         self.branch3 = nn.Sequential(
-            nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
+            nn.AvgPool2d(3, stride=1, padding=1),
             BasicConv2d(1536, 256, kernel_size=1, stride=1)
         )
 
@@ -330,9 +326,19 @@ class InceptionV4(nn.Module):
             Inception_C(),
             Inception_C(),
             Inception_C(),
-            nn.AvgPool2d(8, count_include_pad=False)
+            nn.AvgPool2d(8)
         )
         self.classifier = nn.Linear(1536, num_classes)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+                import scipy.stats as stats
+                stddev = m.stddev if hasattr(m, 'stddev') else 0.1
+                X = stats.truncnorm(-2, 2, scale=stddev)
+                values = torch.Tensor(X.rvs(m.weight.data.numel()))
+                m.weight.data.copy_(values)
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
 
     def forward(self, x):
         x = self.features(x)

@@ -35,8 +35,10 @@ class fcnet(nn.Module):
     def __init__(self, dim, n_classes):
         super(fcnet, self).__init__()
         classifier = nn.Sequential(
+            nn.Dropout(0.5),
             nn.Linear(dim, 1000),
-            nn.ReLU(true),
+            nn.ReLU(True),
+            nn.Dropout(0.2),
             nn.Linear(1000, n_classes)
         )
         self.fc = classifier

@@ -4,3 +4,4 @@ test
 .ipynb_checkpoints
 __pycache__
 model_save
+*.hd5f

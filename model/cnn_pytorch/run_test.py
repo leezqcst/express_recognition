@@ -2,16 +2,18 @@ import os
 import argparse
 
 import torch
+from torch import nn
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
 import model
+from inceptionresnet import InceptionResnetV2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True,
                     help='model choice: inceptionV3, \
-                    inceptionV4, resnet101, resnet152')
+                    inceptionV4, resnet101, resnet152, inception-resnet')
 parser.add_argument('--path', required=True,
                     help='data set path: province, city')
 parser.add_argument('--n_classes', type=int, help='numbers of classes',
@@ -21,12 +23,7 @@ parser.add_argument('--num_worker', type=int,
 opt = parser.parse_args()
 print(opt)
 
-if opt.model == 'inceptionV3':
-    img_size = 299
-if opt.model == 'inceptionV4':
-    img_size = 299
-if opt.model == 'resnet':
-    img_size = 299
+img_size = 299
 
 img_transform = transforms.Compose([
     transforms.Scale(150),
@@ -41,7 +38,7 @@ model_path = os.path.join(root_path,
 batch_size = 32
 num_worker = opt.num_worker
 
-dset = ImageFolder(os.path.join(root_path, 'validation/' + opt.path),
+dset = ImageFolder(os.path.join(root_path, 'train/' + opt.path),
                    transform=img_transform)
 
 dataloader = DataLoader(dset, batch_size=batch_size, shuffle=False,
@@ -57,8 +54,11 @@ if opt.model == 'resnet101':
     mynet = model.resnet(opt.n_classes, 101)
 if opt.model == 'resnet152':
     mynet = model.resnet(opt.n_classes, 152)
+if opt.model == 'inception-resnet':
+    mynet = InceptionResnetV2(opt.n_classes)
 
 mynet.load_state_dict(torch.load(model_path))
+criterion = nn.CrossEntropyLoss()
 
 if use_gpu:
     mynet = mynet.cuda()
@@ -66,15 +66,16 @@ if use_gpu:
 mynet.eval()
 num_correct = 0.0
 total = 0.0
+eval_loss = 0.0
 for data in dataloader:
     img, label = data
-    if use_gpu:
-        img = Variable(img, volatile=True).cuda()
-    else:
-        img = Variable(img, volatile=True)
-
+    img = Variable(img, volatile=True).cuda()
+    label = Variable(label, volatile=True).cuda()
     out = mynet(img)
     _, pred = torch.max(out.data, 1)
-    num_correct += (pred.cpu() == label).sum()
+    loss = criterion(out, label)
+    eval_loss += loss.data[0] * label.size(0)
+    num_correct += (pred.cpu() == label.data.cpu()).sum()
     total += label.size(0)
-print('Acc: {:.6f}'.format(num_correct / total))
+print('Loss: {:.6f} Acc: {:.6f}'.format(eval_loss / total,
+                                        num_correct / total))

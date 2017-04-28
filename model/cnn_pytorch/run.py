@@ -11,11 +11,12 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 import model
+from inceptionresnet import InceptionResnetV2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True,
                     help='model choice: inceptionV3, inceptionV4, \
-                    resnet101, resnet152')
+                    resnet101, resnet152, inception-resnet')
 parser.add_argument('--pretrained', type=bool,
                     help='if load pretrained weigths', default=False)
 parser.add_argument('--path', required=True,
@@ -30,16 +31,12 @@ parser.add_argument('--num_worker', type=int,
 opt = parser.parse_args()
 print(opt)
 
-if opt.model == 'inceptionV3':
-    img_size = 299
 if opt.model == 'resnet101':
-    img_size = 299
     n_layers = 101
 if opt.model == 'resnet152':
-    img_size = 299
     n_layers = 152
-if opt.model == 'inceptionV4':
-    img_size = 299
+
+img_size = 299
 
 img_transform = {
     'train': transforms.Compose([
@@ -93,12 +90,14 @@ if opt.model == 'inceptionV3':
     mynet = model.inceptionV3(opt.n_classes)
 if opt.model == 'inceptionV4':
     mynet = model.InceptionV4(opt.n_classes)
+if opt.model == 'inception-resnet':
+    mynet = InceptionResnetV2(opt.n_classes)
 
 if use_gpu:
     mynet = mynet.cuda()
 
 # define optimizer and loss
-optimizer = optim.SGD(mynet.parameters(), lr=1e-3, momentum=0.9, nesterov=True)
+optimizer = optim.Adam(mynet.parameters())
 criterion = nn.CrossEntropyLoss()
 
 
@@ -160,19 +159,6 @@ for epoch in range(num_epoch):
     print()
 print('Finish Training!')
 print()
-# validation
-# mynet.eval()
-# num_correct = 0.0
-# total = 0.0
-# for data in dataloader['val']:
-#     img, label = data
-#     img = Variable(img, volatile=True).cuda()
-#
-#     out = mynet(img)
-#     _, pred = torch.max(out.data, 1)
-#     num_correct += (pred.cpu() == label).sum()
-#     total += label.size(0)
-# print('Acc:{}'.format(num_correct / total))
 save_path = os.path.join(root_path,
                          'model_save/' + opt.path + '/' + opt.model + '.pth')
 torch.save(mynet.state_dict(), save_path)
