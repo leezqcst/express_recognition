@@ -103,8 +103,10 @@ criterion = nn.CrossEntropyLoss()
 
 
 for epoch in range(num_epoch):
-    print(epoch + 1)
+    print('{}/{}'.format(epoch+1, num_epoch))
     print('*'*10)
+    print('Train')
+    mynet.train()
     running_loss = 0.0
     running_acc = 0.0
     since = time.time()
@@ -113,7 +115,7 @@ for epoch in range(num_epoch):
         img = Variable(img).cuda()
         label = Variable(label).cuda()
         # forward
-        if opt.model == ('inceptionV3' or 'inceptionV4'):
+        if opt.model == 'inceptionV3':
             out, _ = mynet(img)
         else:
             out = mynet(img)
@@ -128,34 +130,49 @@ for epoch in range(num_epoch):
         num_correct = torch.sum(pred == label)
         running_acc += num_correct.data[0]
         if i % 50 == 0:
-            print('Loss:{:.4f}, Acc: {:.4f}'.format(
+            print('Loss: {:.6f}, Acc: {:.4f}'.format(
                                             running_loss / (i * batch_size),
                                             running_acc / (i * batch_size)))
     running_loss /= data_size['train']
     running_acc /= data_size['train']
     elips_time = time.time() - since
-    print('{}/{}, Loss:{:.4f}, Acc:{:.4f}, Time:{:.0f}s'.format(
-                                                        epoch+1,
-                                                        num_epoch,
+    print('Loss: {:.6f}, Acc: {:.4f}, Time: {:.0f}s'.format(
                                                         running_loss,
                                                         running_acc,
                                                         elips_time))
+    print('Validation')
+    mynet.eval()
+    num_correct = 0.0
+    total = 0.0
+    eval_loss = 0.0
+    for data in dataloader['val']:
+        img, label = data
+        img = Variable(img, volatile=True).cuda()
+        label = Variable(label, volatile=True).cuda()
+        out = mynet(img)
+        _, pred = torch.max(out.data, 1)
+        loss = criterion(out, label)
+        eval_loss += loss.data[0] * label.size(0)
+        num_correct += (pred.cpu() == label.data.cpu()).sum()
+        total += label.size(0)
+    print('Loss: {:.6f} Acc: {:.6f}'.format(eval_loss / total,
+                                            num_correct / total))
     print()
 print('Finish Training!')
 print()
 # validation
-mynet.eval()
-num_correct = 0.0
-total = 0.0
-for data in dataloader['val']:
-    img, label = data
-    img = Variable(img, volatile=True).cuda()
-
-    out = mynet(img)
-    _, pred = torch.max(out.data, 1)
-    num_correct += (pred.cpu() == label).sum()
-    total += label.size(0)
-print('Acc:{}'.format(num_correct / total))
+# mynet.eval()
+# num_correct = 0.0
+# total = 0.0
+# for data in dataloader['val']:
+#     img, label = data
+#     img = Variable(img, volatile=True).cuda()
+#
+#     out = mynet(img)
+#     _, pred = torch.max(out.data, 1)
+#     num_correct += (pred.cpu() == label).sum()
+#     total += label.size(0)
+# print('Acc:{}'.format(num_correct / total))
 save_path = os.path.join(root_path,
                          'model_save/' + opt.path + '/' + opt.model + '.pth')
 torch.save(mynet.state_dict(), save_path)
