@@ -38,7 +38,7 @@ model_path = os.path.join(root_path,
 batch_size = 32
 num_worker = opt.num_worker
 
-dset = ImageFolder(os.path.join(root_path, 'train/' + opt.path),
+dset = ImageFolder(os.path.join(root_path, 'validation/' + opt.path),
                    transform=img_transform)
 
 dataloader = DataLoader(dset, batch_size=batch_size, shuffle=False,
