@@ -9,7 +9,7 @@ from torch import optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
+from dataset import Folder
 import model
 from inceptionresnet import InceptionResnetV2
 
@@ -40,13 +40,9 @@ img_size = 299
 
 img_transform = {
     'train': transforms.Compose([
-            transforms.Scale(150),
-            transforms.CenterCrop(img_size),
             transforms.ToTensor()
         ]),
     'val': transforms.Compose([
-            transforms.Scale(150),
-            transforms.CenterCrop(img_size),
             transforms.ToTensor()
         ])
 }
@@ -57,10 +53,10 @@ batch_size = opt.batch_size
 num_epoch = opt.epoch
 # 读取数据文件夹
 dset = {
-    'train': ImageFolder(os.path.join(root_path, 'train/' + opt.path),
-                         transform=img_transform['train']),
-    'val': ImageFolder(os.path.join(root_path, 'validation/' + opt.path),
-                       transform=img_transform['val'])
+    'train': Folder(os.path.join(root_path, 'train/' + opt.path),
+                    transform=img_transform['train']),
+    'val': Folder(os.path.join(root_path, 'validation/' + opt.path),
+                  transform=img_transform['val'])
 }
 
 # 读取数据

@@ -5,7 +5,7 @@ import torch
 from torch import nn
 import torchvision.transforms as transforms
 from torch.autograd import Variable
-from torchvision.datasets import ImageFolder
+from dataset import Folder
 from torch.utils.data import DataLoader
 import model
 from inceptionresnet import InceptionResnetV2
@@ -26,8 +26,6 @@ print(opt)
 img_size = 299
 
 img_transform = transforms.Compose([
-    transforms.Scale(150),
-    transforms.CenterCrop(img_size),
     transforms.ToTensor()
 ])
 
@@ -38,8 +36,8 @@ model_path = os.path.join(root_path,
 batch_size = 32
 num_worker = opt.num_worker
 
-dset = ImageFolder(os.path.join(root_path, 'validation/' + opt.path),
-                   transform=img_transform)
+dset = Folder(os.path.join(root_path, 'validation/' + opt.path),
+              transform=img_transform)
 
 dataloader = DataLoader(dset, batch_size=batch_size, shuffle=False,
                         num_workers=num_worker)
