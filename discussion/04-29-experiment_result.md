@@ -25,4 +25,14 @@ batch size = 32
 learning rate = 0.001  
 optimizer = Adam  
 
-time = 178s / epoch
+time = 192s / epoch
+validation loss = 0.067062  
+validation accuracy = 0.986318  
+
+### inceptionV3
+epoch = 150  
+batch size = 32  
+learning rate = 0.001  
+optimizer = Adam  
+
+time =   
