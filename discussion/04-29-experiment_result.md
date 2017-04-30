@@ -1,5 +1,5 @@
 ### inception-resnet  
-epoch = 50
+epoch = 50  
 batch size = 32  
 learning rate = 0.001  
 optimizer = Adam  
