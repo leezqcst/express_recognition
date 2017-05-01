@@ -33,9 +33,10 @@ batch size = 32
 learning rate = 0.001  
 optimizer = Adam  
 
-time = 192s / epoch
-validation loss = 0.067062  
-validation accuracy = 0.986318  
+
+time = 192s / epoch  
+validation loss = 0.0067062  
+validation accuracy = 0.986318
 
 
 
