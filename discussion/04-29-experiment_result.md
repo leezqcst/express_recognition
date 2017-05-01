@@ -1,8 +1,8 @@
 
 ## 本次测试结果使用数据集情况（64个城市）
 
-- 训练集：152*60+140*4=9680张
-- 验证集：13*60+4+4+8+8=804张
+- 训练集：152乘60+140乘4=9680张
+- 验证集：13乘60+4+4+8+8=804张
 
 ### inceptionV3
 epoch = 150  
@@ -10,21 +10,19 @@ batch size = 32
 learning rate = 0.001  
 optimizer = Adam  
 
-time = 85s / epoch
+time = 85s / epoch  
 validation loss = 0.179210  
 validation accuracy = 0.965147
-
 
 ### resnet152
 epoch = 100  
 batch size = 28  
 learning rate = 0.001  
 optimizer = Adam  
-
-time = 264s / epoch 
+ 
+time = 264s / epoch  
 validation loss = 0.131161  
-validation accuracy = 0.962687  
-
+validation accuracy = 0.962687
 
 
 ### inceptionV4
