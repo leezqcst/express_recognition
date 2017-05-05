@@ -19,8 +19,9 @@ import crnn
 
 
 # In[2]:
-img_root = '~/Documents/express_recognition/data/train/telephone'
-txt_root = '~/Documents/express_recognition/data/train/telephone_label_train'
+root = '/home/sherlock/'
+img_root = root + 'Documents/express_recognition/data/train/telephone'
+txt_root = root + 'Documents/express_recognition/data/train/telephone_label_train.txt'
 
 dset = dataset.Dataset(img_root=img_root, txt_root=txt_root)
 
