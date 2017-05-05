@@ -56,22 +56,26 @@ class CRNN(nn.Module):
                                nn.ReLU(inplace=True))
 
         convRelu(0)
-        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(2, 2))  # 64x16x64
+        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(2, 2))  # 64x32x128
         convRelu(1)
-        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d(2, 2))  # 128x8x32
+        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d(2, 2))  # 128x16x64
         convRelu(2, True)
         convRelu(3)
         cnn.add_module('pooling{0}'.format(2),
                        nn.MaxPool2d((2, 2),
-                                    (2, 1),
-                                    (0, 1)))  # 256x4x16
+                                    (2, 2),
+                                    (0, 0)))  # 256x8x32
         convRelu(4, True)
         convRelu(5)
         cnn.add_module('pooling{0}'.format(3),
                        nn.MaxPool2d((2, 2),
                                     (2, 1),
-                                    (0, 1)))  # 512x2x16
-        convRelu(6, True)  # 512x1x16
+                                    (0, 1)))  # 512x1x34
+        convRelu(6, True)  # 512x2x16
+        # cnn.add_module('avgpooling{0}'.format(4),
+        #                nn.AvgPool2d((2, 1),
+        #                             (1, 1),
+        #                             (0, 0)))  # 512x1x16
 
         self.cnn = cnn
         self.rnn = nn.Sequential(

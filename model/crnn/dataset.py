@@ -12,7 +12,7 @@ from PIL import Image
 
 
 def default_loader(path):
-    return Image.open(path).convert('RGB')
+    return Image.open(path).convert('L')
 
 
 def image_label(img_root, txt_path):

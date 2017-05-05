@@ -5,6 +5,7 @@ import os
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
+import cv2
 
 IMG_EXTENSIONS = [
     '.jpg', '.JPG', '.jpeg', '.JPEG', '.png', '.PNG',
@@ -45,6 +46,23 @@ def default_loader(path):
     return Image.open(path).convert('RGB')
 
 
+def resize(raw_img, target_size=(299, 299)):
+    fx = target_size[0] / raw_img.shape[0]
+    fy = target_size[1] / raw_img.shape[1]
+    fx = fy = min(fx, fy)
+    img = cv2.resize(raw_img, None, fx=fx, fy=fy,
+                     interpolation=cv2.INTER_CUBIC)
+    out_img = np.ones((target_size[0], target_size[1], 3)) * 255
+    w = img.shape[1]
+    h = img.shape[0]
+    x = (target_size[1] - w) / 2
+    y = (target_size[0] - h) / 2
+    x = int(x)
+    y = int(y)
+    out_img[y:y+h, x:x+w] = img
+    return out_img
+
+
 class Folder(Dataset):
     def __init__(self, root, target_size=(299, 299),
                  transform=None, target_transform=None,
@@ -67,7 +85,9 @@ class Folder(Dataset):
     def __getitem__(self, index):
         path, target = self.imgs[index]
         img = self.loader(path)
-        img = img.resize(self.target_size)
+        if target_size is not None:
+            # img = resize(img, self.target_size)
+            img = img.resize(self.target_size)
         if self.transform is not None:
             img = self.transform(img)
         if self.target_transform is not None:
