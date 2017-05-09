@@ -31,4 +31,10 @@
 
 **1.** 增加cnn提取特征的长度，使得提取出来的特征足够多，这样才能够有效的分别空白
 
-**2.** 图片预处理部分
+**2.** 使用更强的cnn网络提取特征，比如inception net 的前几层提取
+
+**3.** 参考论文增加attention GRU的部分
+
+![Alt text](/home/sherlock/Desktop/Screenshot from 2017-05-09 21-30-53.png)
+
+**4.** 图片预处理部分
