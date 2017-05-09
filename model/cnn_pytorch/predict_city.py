@@ -44,9 +44,6 @@ preds = F.softmax(preds)
 prob, label = torch.topk(preds, 3, 1)
 prob = prob.data[0]
 label = label.data[0]
-with open('./pred.txt', 'w') as f:
-    for i in prob:
-        f.write(str(i)+'\n')
-    for i in label:
-        f.write(str(i)+'\n')
-print('Finish predicting and the result is saved in pred.txt')
+print('top 3 probability: {}'.format(prob))
+print('top 3 label: {}'.format(label))
+print('Finish predicting')
