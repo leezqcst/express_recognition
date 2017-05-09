@@ -42,8 +42,6 @@ mynet = crnn.CRNN(32, nc, nclass, nh)
 
 mynet.cuda()
 
-criterion = criterion.cuda()
-
 loss_avg = utils.averager()
 optimizer = optim.Adadelta(mynet.parameters(), lr=1e-3)
 
@@ -52,16 +50,14 @@ def trainBatch(crnn, criterion, optimizer):
     data = train_iter.next()
     cpu_images, cpu_texts = data
     batch_size = cpu_images.size(0)
-    image = torch.FloatTensor(cpu_images)
-    image = Variable(image).cuda()
+    image = Variable(cpu_images).cuda()
     t, le = converter.encode(cpu_texts)
-    text = torch.IntTensor(t)
-    text = Variable(text)
-    length = torch.IntTensor(le)
-    length = Variable(length)
+    text = Variable(t)
+    length = Variable(le)
     preds = crnn(image)
     preds_size = Variable(torch.IntTensor([preds.size(0)] * batch_size))
     cost = criterion(preds, text, preds_size, length) / batch_size
+    # preds on cuda, text, preds_size, length is not on cuda
     crnn.zero_grad()
     cost.backward()
     optimizer.step()
