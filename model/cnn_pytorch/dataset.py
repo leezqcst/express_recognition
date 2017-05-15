@@ -85,7 +85,7 @@ class Folder(Dataset):
     def __getitem__(self, index):
         path, target = self.imgs[index]
         img = self.loader(path)
-        if target_size is not None:
+        if self.target_size is not None:
             # img = resize(img, self.target_size)
             img = img.resize(self.target_size)
         if self.transform is not None:

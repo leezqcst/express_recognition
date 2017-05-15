@@ -5,3 +5,4 @@ test
 __pycache__
 model_save
 *.hd5f
+*.pth

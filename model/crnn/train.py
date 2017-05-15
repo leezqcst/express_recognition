@@ -76,7 +76,7 @@ for epoch in range(epoches):
         cost = trainBatch(mynet, criterion, optimizer)
         loss_avg.add(cost)
         i += 1
-        if (epoch+1) % 500 == 0:
+        if (epoch+1) % 1 == 0:
             if i % 10 == 0:
                 print('[%d/%d][%d/%d] Loss: %f' %
                       (epoch+1, epoches, i, len(dataloader), loss_avg.val()))
