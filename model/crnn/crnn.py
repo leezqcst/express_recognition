@@ -6,7 +6,7 @@ class BidirectionalLSTM(nn.Module):
     def __init__(self, nIn, nHidden, nOut):
         super(BidirectionalLSTM, self).__init__()
 
-        self.rnn = nn.LSTM(nIn, nHidden, bidirectional=True)
+        self.rnn = nn.GRU(nIn, nHidden, bidirectional=True)
         self.embedding = nn.Linear(nHidden * 2, nOut)
 
     def forward(self, input):
