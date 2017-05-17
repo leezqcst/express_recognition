@@ -1,4 +1,4 @@
-### 1. 输出 64
+### 1. 输出 长度为64
 改变cnn，去掉一层max pool，使得输出的长度变为64，希望长度变长之后能够得到更多的有效信息，比如空白，和每个数字
 
 **结果**
@@ -17,8 +17,21 @@
 ### 3.改变图片大小，同时改变网络
 图片输入变成256，同时网络增加一层max pool使得输出序列长度为32
 
+预测数字基本都能识别对，对于打印的数字反而有一些识别不对，可能是因为打印版本的数字不同
 
 ### 4.使用GRU
+效果比LSTM更好，能够识别重复数字，因为GRU比LSTM
+
+**LSTM**  
+![1](http://upload-images.jianshu.io/upload_images/3623720-052d62685cf93eb4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+**GRU**  
+![2](http://upload-images.jianshu.io/upload_images/3623720-c25c7163e1107c6e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
-### 5.增加attention
+### 5.输出概率结果
+
+
+
+### 6.增加attention
+waiting
