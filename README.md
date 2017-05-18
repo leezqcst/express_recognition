@@ -1,20 +1,29 @@
 # express_recognition
+## Introduce
+In this project, we use deep learning to recognize the province, city and telephone numbers.
 
-### Introduce
-这个项目主要是使用深度学习和机器学习的方法来辨识快递单中的省份地址还有电话号码
+## Method
+### Province, city and district
+In this part, we treat it as a classification problem. In China, there are about 30 province and 150 cities. We use just convolutional neural network to do this task.
 
-### help link:
-#### tensorflow framework:  
-tensorflow doc: https://www.tensorflow.org/  
-keras doc: https://keras.io/  
-keras chinese doc: http://keras-cn.readthedocs.io/en/latest/
+### telephone numbers
+In this part, we use the method refered to in this [paper](http://arxiv.org/abs/1507.05717). In summary, we use cnn to do feature extraction, and rnn to process feature sequence, and ctc loss to evaluate it. It is a sequence to sequence model.
 
-#### pytorch framework:
-pytorch tutorial: http://pytorch.org/tutorials/  
-pytorch doc: http://pytorch.org/docs/
+## Dependencies
+We use PyTorch to implement almost all our models.
 
-#### study resource:
-git study: http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000  
-CNN: http://cs231n.github.io/convolutional-networks/  
-RNN(LSTM): http://colah.github.io/posts/2015-08-Understanding-LSTMs/  
-RCNN: http://www.jianshu.com/p/cef69c6651a9
+## Citation
+
+    @article{ShiBY15,
+      author    = {Baoguang Shi and
+                   Xiang Bai and
+                   Cong Yao},
+      title     = {An End-to-End Trainable Neural Network for Image-based Sequence Recognition
+                   and Its Application to Scene Text Recognition},
+      journal   = {CoRR},
+      volume    = {abs/1507.05717},
+      year      = {2015}
+    }
+
+## Acknowledgements
+Please let me know if you encounter any issues.
