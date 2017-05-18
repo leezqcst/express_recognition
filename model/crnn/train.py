@@ -30,7 +30,7 @@ txt_root = root + 'train/telephone_label_train.txt'
 
 dset = dataset.Dataset(img_root=img_root, txt_root=txt_root)
 
-dataloader = DataLoader(dset, batch_size=32, num_workers=4,
+dataloader = DataLoader(dset, batch_size=32, shuffle=True, num_workers=4,
                         collate_fn=dataset.alignCollate())
 
 
