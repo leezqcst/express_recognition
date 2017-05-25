@@ -5,18 +5,18 @@
 
 ### Experiment Result
 
-1. baseline
-  loss: 0.000002
+1. baseline  
+  loss: 0.000002  
   total accuracy: 0.826211
 
-2. convert 0, 1
-  loss: 0.000002
-  total accuracy: 0.837607 
+2. convert 0, 1  
+  loss: 0.000002  
+  total accuracy: 0.837607
 
-3. 重复数字中间加a
+3. 重复数字中间加a  
   loss: 0.000003  
   total accuracy: 0.800570
 
-4. 另外一种重复数字的编码
-  loss: 0.000003
+4. 另外一种重复数字的编码  
+  loss: 0.000003  
   total accuracy: 0.484330
