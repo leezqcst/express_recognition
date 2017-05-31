@@ -18,4 +18,4 @@
   
   
 ### 低像素手写体省份识别
- ![1.jpg](C:\Users\Administrator\Desktop\)
+![1.jpg](C:\Users\Administrator\Desktop\)
