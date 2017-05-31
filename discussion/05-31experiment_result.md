@@ -14,4 +14,8 @@
   new accuracy: 0.631579(180)  
 
 3. 重复数字中间加'abcdefghij'  
-  accuracy: 0.392982
+  accuracy: 0.392982
+  
+  
+### 低像素手写体省份识别
+![1.jpg](C:\Users\Administrator\Desktop)
