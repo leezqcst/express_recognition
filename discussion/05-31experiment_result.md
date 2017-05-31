@@ -10,8 +10,8 @@
   new accuracy: 0.670175(191)   
 
 2. convert 0, 1  
-  old accuracy:  
-  new accuracy:   
+  old accuracy: 0.610526(174)  
+  new accuracy: 0.631579(180)  
 
 3. 重复数字中间加'abcdefghij'  
   accuracy: 0.392982
