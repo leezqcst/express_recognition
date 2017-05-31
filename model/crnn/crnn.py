@@ -13,12 +13,16 @@ class BidirectionalLSTM(nn.Module):
         recurrent, _ = self.rnn(input)
 
         T, b, h = recurrent.size()
-        t_rec = recurrent.view(T * b, h)
+        t_rec = recurrent.view(b * T, h)
         output = self.embedding(t_rec)
         output = output.view(T, b, -1)
-
         return output
 
+
+class Dense2class(nn.Module):
+    def __init__(self, ):
+        super(Dense2class, self).__init__()
+        
 
 class CRNN(nn.Module):
 

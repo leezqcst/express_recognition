@@ -9,12 +9,12 @@ import collections
 class strLabelConverter(object):
 
     def __init__(self, alphabet):
-        self.alphabet = alphabet + '-'  # for `-1` index
+        self.alphabet = alphabet  # for `-1` index
 
         self.dict = {}
         for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
-            self.dict[char] = i + 1
+            self.dict[char] = i
 
     def encode(self, text, depth=0):
         """Support batch or single str."""
