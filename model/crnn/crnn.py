@@ -1,33 +1,23 @@
 import torch.nn as nn
+import torch.nn.functional as F
 
 
-class BidirectionalLSTM(nn.Module):
+class BidirectionalGRU(nn.Module):
 
-    def __init__(self, nIn, nHidden, nOut):
-        super(BidirectionalLSTM, self).__init__()
-
-        self.rnn = nn.GRU(nIn, nHidden, bidirectional=True)
-        self.embedding = nn.Linear(nHidden * 2, nOut)
+    def __init__(self, nIn, nHidden, n_layers):
+        super(BidirectionalGRU, self).__init__()
+        self.n_layers = n_layers
+        self.rnn = nn.GRU(nIn, nHidden, n_layers)
 
     def forward(self, input):
-        recurrent, _ = self.rnn(input)
-
-        T, b, h = recurrent.size()
-        t_rec = recurrent.view(b * T, h)
-        output = self.embedding(t_rec)
-        output = output.view(T, b, -1)
-        return output
+        recurrent, hidden = self.rnn(input)
+        return recurrent, hidden
 
 
-class Dense2class(nn.Module):
-    def __init__(self, ):
-        super(Dense2class, self).__init__()
-        
+class EncoderCRNN(nn.Module):
 
-class CRNN(nn.Module):
-
-    def __init__(self, imgH, nc, nclass, nh, n_rnn=2, leakyRelu=False):
-        super(CRNN, self).__init__()
+    def __init__(self, imgH, nc, nh, n_layers, leakyRelu=False):
+        super(EncoderCRNN, self).__init__()
 
         assert imgH % 16 == 0, 'image heigth must be a multiple of 16'
 
@@ -82,10 +72,7 @@ class CRNN(nn.Module):
         #                             (0, 0)))  # 512x1x16
 
         self.cnn = cnn
-        self.rnn = nn.Sequential(
-            BidirectionalLSTM(512, nh, nh),
-            BidirectionalLSTM(nh, nh, nclass)
-        )
+        self.rnn = BidirectionalGRU(512, nh, n_layers)
 
     def forward(self, input):
         # conv features map
@@ -93,8 +80,28 @@ class CRNN(nn.Module):
         b, c, h, w = conv.size()
         assert h == 1, 'the height of conv must be 1'
         conv = conv.squeeze(2)
-        conv = conv.permute(2, 0, 1)  # [width, batchsize, channel]
+        conv = conv.permute(2, 0, 1)  # [length, batchsize, channel]
+        encoder, hidden = self.rnn(conv)
+        return encoder, hidden
 
-        output = self.rnn(conv)
 
-        return output
+class DecoderRNN(nn.Module):
+    def __init__(self, hidden_size, output_size, n_layers):
+        super(DecoderRNN, self).__init__()
+        self.n_layers = n_layers
+        self.hidden_size = hidden_size
+        self.output_size = output_size
+
+        self.gru = nn.GRU(hidden_size, hidden_size, n_layers)
+        self.out = nn.Linear(hidden_size, output_size)
+        self.softmax = nn.LogSoftmax()
+
+    def forward(self, input, hidden):
+        input = F.relu(input)
+        output, hidden = self.gru(input, hidden)
+        l, b, d = output.size()
+        output = output.view(l*b, d)
+        output = self.out(output)
+        output = self.softmax(output)
+        output = output.view(l, b, -1)
+        return output, hidden

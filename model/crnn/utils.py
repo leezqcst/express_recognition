@@ -12,9 +12,11 @@ class strLabelConverter(object):
         self.alphabet = alphabet  # for `-1` index
 
         self.dict = {}
+        self.dict['s'] = 0
+        self.dict['e'] = 1
         for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
-            self.dict[char] = i
+            self.dict[char] = i + 2
 
     def encode(self, text, depth=0):
         """Support batch or single str."""
