@@ -12,11 +12,9 @@ class strLabelConverter(object):
         self.alphabet = alphabet  # for `-1` index
 
         self.dict = {}
-        self.dict['s'] = 0
-        self.dict['e'] = 1
         for i, char in enumerate(alphabet):
             # NOTE: 0 is reserved for 'blank' required by wrap_ctc
-            self.dict[char] = i + 2
+            self.dict[char] = i
 
     def encode(self, text, depth=0):
         """Support batch or single str."""
@@ -30,7 +28,7 @@ class strLabelConverter(object):
 
         if depth:
             return text, len(text)
-        return (torch.IntTensor(text), torch.IntTensor(length))
+        return (torch.LongTensor(text), torch.LongTensor(length))
 
     def decode(self, t, length, raw=False):
         if length.numel() == 1:

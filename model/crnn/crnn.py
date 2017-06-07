@@ -1,13 +1,14 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 
-class EncoderCRNN(nn.Module):
+class ExtractCNN(nn.Module):
+    def __init__(self, imgH, nc, leakyRelu=False):
+        super(ExtractCNN, self).__init__()
 
-    def __init__(self, imgH, nc, nh, n_layers, leakyRelu=False):
-        super(EncoderCRNN, self).__init__()
-
-        assert imgH % 16 == 0, 'image heigth must be a multiple of 16'
+        assert imgH % 16 == 0, 'image height must be a multiple of 16'
 
         kernel_size = [3, 3, 3, 3, 3, 3, 2]
         padding_size = [1, 1, 1, 1, 1, 1, 0]
@@ -60,7 +61,6 @@ class EncoderCRNN(nn.Module):
         #                             (0, 0)))  # 512x1x16
 
         self.cnn = cnn
-        self.rnn = nn.GRU(512, nh, n_layers)
 
     def forward(self, input):
         # conv features map
@@ -68,28 +68,52 @@ class EncoderCRNN(nn.Module):
         b, c, h, w = conv.size()
         assert h == 1, 'the height of conv must be 1'
         conv = conv.squeeze(2)
-        conv = conv.permute(2, 0, 1)  # [length, batchsize, channel]
-        output, hidden = self.rnn(conv)
+        conv = conv.permute(2, 0, 1)  # [length, batch_size, channel]
+        return conv
+
+
+class Encoder(nn.Module):
+    def __init__(self, input_size, hidden_size, n_layers=1):
+        super(Encoder, self).__init__()
+        self.n_layers = n_layers
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+
+        self.gru = nn.GRU(input_size, hidden_size,
+                          num_layers=n_layers)
+
+    def forward(self, input, hidden):
+        output, hidden = self.gru(input, hidden)
         return output, hidden
 
+    def initHidden(self, batch_size):
+        hidden = Variable(torch.zeros(self.n_layers, batch_size,
+                                      self.hidden_size))
+        return hidden.cuda()
 
-class DecoderRNN(nn.Module):
-    def __init__(self, hidden_size, output_size, n_layers):
-        super(DecoderRNN, self).__init__()
+
+class Decoder(nn.Module):
+    def __init__(self, hidden_size, output_size, n_layers=1):
+        super(Decoder, self).__init__()
         self.n_layers = n_layers
         self.hidden_size = hidden_size
         self.output_size = output_size
 
-        self.gru = nn.GRU(hidden_size, hidden_size, n_layers)
-        self.out = nn.Linear(hidden_size, output_size)
+        self.gru = nn.GRU(hidden_size, hidden_size,
+                          num_layers=n_layers)
+        self.fc = nn.Linear(hidden_size, output_size)
         self.softmax = nn.LogSoftmax()
 
     def forward(self, input, hidden):
+        assert input.size()[0] == 1, 'length must be 1'
         input = F.relu(input)
         output, hidden = self.gru(input, hidden)
-        l, b, d = output.size()
-        output = output.view(l*b, d)
-        output = self.out(output)
+        output = output.squeeze(0)
+        output = self.fc(output)
         output = self.softmax(output)
-        output = output.view(l, b, -1)
         return output, hidden
+
+    def initHidden(self, batch_size):
+        hidden = Variable(torch.zeros(self.n_layers, batch_size,
+                                      self.hidden_size))
+        return hidden.cuda()
