@@ -2,18 +2,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class BidirectionalGRU(nn.Module):
-
-    def __init__(self, nIn, nHidden, n_layers):
-        super(BidirectionalGRU, self).__init__()
-        self.n_layers = n_layers
-        self.rnn = nn.GRU(nIn, nHidden, n_layers)
-
-    def forward(self, input):
-        recurrent, hidden = self.rnn(input)
-        return recurrent, hidden
-
-
 class EncoderCRNN(nn.Module):
 
     def __init__(self, imgH, nc, nh, n_layers, leakyRelu=False):
@@ -72,7 +60,7 @@ class EncoderCRNN(nn.Module):
         #                             (0, 0)))  # 512x1x16
 
         self.cnn = cnn
-        self.rnn = BidirectionalGRU(512, nh, n_layers)
+        self.rnn = nn.GRU(512, nh, n_layers)
 
     def forward(self, input):
         # conv features map
@@ -81,8 +69,8 @@ class EncoderCRNN(nn.Module):
         assert h == 1, 'the height of conv must be 1'
         conv = conv.squeeze(2)
         conv = conv.permute(2, 0, 1)  # [length, batchsize, channel]
-        encoder, hidden = self.rnn(conv)
-        return encoder, hidden
+        output, hidden = self.rnn(conv)
+        return output, hidden
 
 
 class DecoderRNN(nn.Module):
