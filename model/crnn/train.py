@@ -17,20 +17,18 @@ import crnn
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True,
                     help='saved model name')
-parser.add_argument('--label', required=True,
-                    help='a, b, c')
-parser.add_argument('--epoch', type=int, default=10000,
+parser.add_argument('--epoch', type=int, default=7000,
                     help='training epoches')
 opt = parser.parse_args()
 print(opt)
 
-root = '/home/sherlock/Documents/express_recognition/data/'
-img_root = root + 'train/telephone'
-txt_root = root + 'train/telephone_label_train.txt'
+root = '/home/node/Documents/express_recognition/data/'
+img_root = root + 'train/telephone_4'
+txt_root = root + 'train/telephone_label_train_4.txt'
 
 dset = dataset.Dataset(img_root=img_root, txt_root=txt_root)
 
-dataloader = DataLoader(dset, batch_size=32, shuffle=True, num_workers=4,
+dataloader = DataLoader(dset, batch_size=64, shuffle=True, num_workers=6,
                         collate_fn=dataset.alignCollate())
 
 
@@ -38,7 +36,6 @@ nh = 100
 alphabet = '0123456789'
 nclass = len(alphabet) + 1
 nc = 1
-epoches = 10000
 
 converter = utils.strLabelConverter(alphabet)
 criterion = CTCLoss()
@@ -82,7 +79,7 @@ for epoch in range(opt.epoch):
         loss_avg.add(cost)
         i += 1
         if (epoch+1) % 1 == 0:
-            if i % 10 == 0:
+            if i % 30 == 0:
                 print('[%d/%d][%d/%d] Loss: %f' %
                       (epoch+1, opt.epoch, i, len(dataloader), loss_avg.val()))
                 loss_avg.reset()
